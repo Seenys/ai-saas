@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/nextjs": "^4.23.2",
     "@radix-ui/react-slot": "^1.0.2",
     "@types/node": "20.5.0",
     "@types/react": "18.2.20",
@@ -18,9 +19,10 @@
     "clsx": "^2.0.0",
     "eslint": "8.47.0",
     "eslint-config-next": "13.4.13",
-    "lucide-react": "^0.267.0",
-    "next": "13.4.13",
+    "lucide-react": "^0.263.0",
+    "next": "^13.4.15",
     "postcss": "8.4.27",
+    "prettier": "^3.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "tailwind-merge": "^1.14.0",
