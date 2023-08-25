@@ -62,6 +62,7 @@ const ConversationPage = () => {
                         className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                         disabled={isLoading}
                         placeholder="How do i calculate the area of a circle?"
+                        {...field}
                       />
                     </FormControl>
                   </FormItem>
