@@ -10,11 +10,16 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Empty } from "@/components/empty";
-import { UserAvatar } from "@/components/user-avatar";
-import { BotAvatar } from "@/components/bot-avatar";
 import { Loader } from "@/components/loader";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 // types
-import { ChatCompletionRequestMessage } from "openai";
+import { AmountResolutionOption } from "./types";
 // icons: https://lucide.dev/icons
 import { ImageIcon, MessageSquare } from "lucide-react";
 // others
@@ -22,7 +27,7 @@ import * as z from "zod";
 import { cn } from "@/lib/utils";
 import axios, { AxiosResponse } from "axios";
 // constants
-import { formSchema } from "./constants";
+import { formSchema, amountOptions } from "./constants";
 
 const ConversationPage = () => {
   const router = useRouter();
@@ -106,7 +111,25 @@ const ConversationPage = () => {
                 name="amount"
                 render={({ field }) => (
                   <FormItem className="col-span-12 lg:col-span-2">
-                    <FormControl className="m-0 p-0"></FormControl>
+                    <Select
+                      disabled={isLoading}
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue defaultValue={field.value} />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {amountOptions.map((option: AmountResolutionOption) => (
+                          <SelectItem value={option.value} key={option.value}>
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormItem>
                 )}
               />
