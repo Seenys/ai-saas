@@ -10,17 +10,12 @@ const configuration = {
 
 const openai = new OpenAI(configuration);
 
-const instructionsMessage = {
-  role: "system",
-  content:
-    "You are a code generator, You must answer only in markdown code snippets. Use code comments to explain your code.",
-};
-
 export const POST = async (req: Request) => {
   try {
     const { userId }: { userId: string | null } = auth();
     const body = await req.json();
-    const { messages } = body;
+    const { prompt, amount, resolution } = body;
+
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
@@ -29,17 +24,19 @@ export const POST = async (req: Request) => {
       return new NextResponse("OpenAi API key not configured", { status: 500 });
     }
 
-    if (!messages) {
-      return new NextResponse("Messages are required", { status: 400 });
+    if (!prompt) {
+      return new NextResponse("Prompt are required", { status: 400 });
     }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
-      messages: [instructionsMessage, ...messages],
+    const response = await openai.images.generate({
+      model: "dall-e-2",
+      prompt: prompt,
+      n: parseInt(amount),
+      size: resolution,
     });
-    return NextResponse.json(response.choices[0].message);
+    return NextResponse.json(response.data);
   } catch (e) {
-    console.log("[CODE_ERROR]: ", e);
+    console.log("[CONVERSATION_ERROR]: ", e);
     return new NextResponse("Internal Server Error here", { status: 500 });
   }
 };
