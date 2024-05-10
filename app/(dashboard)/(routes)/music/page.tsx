@@ -10,23 +10,19 @@ import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Empty } from "@/components/empty";
-import { UserAvatar } from "@/components/user-avatar";
-import { BotAvatar } from "@/components/bot-avatar";
 import { Loader } from "@/components/loader";
-// types
-import { ChatCompletionRequestMessage } from "openai";
+
 // icons: https://lucide.dev/icons
-import { MessageSquare } from "lucide-react";
+import { Music } from "lucide-react";
 // others
 import * as z from "zod";
-import { cn } from "@/lib/utils";
 import axios, { AxiosResponse } from "axios";
 // constants
 import { formSchema } from "./constants";
 
-const ConversationPage = () => {
+const MusicPage = () => {
   const router = useRouter();
-  const [messages, setMessages] = useState<ChatCompletionRequestMessage[]>([]);
+  const [music, setMusic] = useState<string>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,27 +37,11 @@ const ConversationPage = () => {
     values: z.infer<typeof formSchema>
   ): Promise<void> => {
     try {
-      const userMessage: ChatCompletionRequestMessage = {
-        role: "user",
-        content: values.prompt,
-      };
+      setMusic(undefined);
 
-      const newMessages: ChatCompletionRequestMessage[] = [
-        ...messages,
-        userMessage,
-      ];
+      const response: AxiosResponse = await axios.post("/api/music", values);
 
-      const response: AxiosResponse<ChatCompletionRequestMessage> =
-        await axios.post("/api/conversation", {
-          messages: newMessages,
-        });
-
-      setMessages((current: ChatCompletionRequestMessage[]) => [
-        ...current,
-        userMessage,
-        response.data,
-      ]);
-
+      setMusic(response.data.audio);
       form.reset();
     } catch (e: any) {
       //TODO: premium plan
@@ -74,11 +54,11 @@ const ConversationPage = () => {
   return (
     <>
       <Heading
-        title="Conversation"
-        description="This is the conversation page"
-        icon={MessageSquare}
-        iconColor="text-violet-500"
-        bgColor="bg-violet-500/10"
+        title="Music Generation"
+        description="Turn your prompt into a music"
+        icon={Music}
+        iconColor="text-emerald-500"
+        bgColor="bg-emerald-500/10"
       />
       <div className="px-4 lg:px-8">
         <div>
@@ -104,7 +84,7 @@ const ConversationPage = () => {
                       <Input
                         className="border-0 outline-none focus-visible:ring-0 focus-visible:ring-transparent"
                         disabled={isLoading}
-                        placeholder="How do i calculate the area of a circle?"
+                        placeholder="Piano, Guitar, Drums, etc."
                         {...field}
                       />
                     </FormControl>
@@ -127,29 +107,16 @@ const ConversationPage = () => {
               <Loader />
             </div>
           )}
-          {messages.length === 0 && !isLoading && (
-            <Empty label="Nothing Here..." />
+          {!music && !isLoading && <Empty label="No Music Generated..." />}
+          {music && (
+            <audio controls className="w-full">
+              <source src={music} type="audio/mpeg" />
+            </audio>
           )}
-          <div className="flex flex-col-reverse gap-y-4">
-            {messages.map((message: ChatCompletionRequestMessage) => (
-              <div
-                key={message.content}
-                className={cn(
-                  "p-8 w-full flex items-center gap-x-8 rounded-lg",
-                  message.role === "user"
-                    ? "bg-white border border-black/10"
-                    : "bg-muted"
-                )}
-              >
-                {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
-                <p className="text-sm">{message.content}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </>
   );
 };
 
-export default ConversationPage;
+export default MusicPage;
