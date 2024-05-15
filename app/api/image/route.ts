@@ -4,6 +4,9 @@ import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 
+// Limitss imports
+import { checkApiLimit, increaseApiLimit } from "@/lib/api-limit";
+
 const configuration = {
   apiKey: process.env.OPENAI_API_KEY,
 };
@@ -28,12 +31,27 @@ export const POST = async (req: Request) => {
       return new NextResponse("Prompt are required", { status: 400 });
     }
 
+    if (!amount) {
+      return new NextResponse("Amount are required", { status: 400 });
+    }
+
+    if (!resolution) {
+      return new NextResponse("Resolution are required", { status: 400 });
+    }
+
+    const freeTrialLimitReached = await checkApiLimit();
+
+    if (freeTrialLimitReached) {
+      return new NextResponse("Free trial limit reached", { status: 403 });
+    }
+
     const response = await openai.images.generate({
       model: "dall-e-3",
       prompt: prompt,
       n: parseInt(amount),
       size: resolution,
     });
+    await increaseApiLimit();
     return NextResponse.json(response.data);
   } catch (e) {
     console.log("[CONVERSATION_ERROR]: ", e);

@@ -4,6 +4,9 @@ import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import Replicate from "replicate";
 
+// Limitss imports
+import { checkApiLimit, increaseApiLimit } from "@/lib/api-limit";
+
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN,
 });
@@ -18,6 +21,12 @@ export const POST = async (req: Request) => {
       return new NextResponse("Unauthorized", { status: 401 });
     }
 
+    const freeTrialLimitReached = await checkApiLimit();
+
+    if (freeTrialLimitReached) {
+      return new NextResponse("Free trial limit reached", { status: 403 });
+    }
+
     const input = {
       seed: 255224557,
       n_prompt:
@@ -29,7 +38,7 @@ export const POST = async (req: Request) => {
       "lucataco/animate-diff:beecf59c4aee8d81bf04f0381033dfa10dc16e845b4ae00d281e2fa377e48a9f",
       { input }
     );
-
+    await increaseApiLimit();
     return NextResponse.json(response);
   } catch (e) {
     console.log("[MUSIC_ERROR]: ", e);

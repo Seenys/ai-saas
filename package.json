@@ -11,7 +11,7 @@
   "dependencies": {
     "@clerk/nextjs": "^5.0.7",
     "@hookform/resolvers": "^3.3.4",
-    "@prisma/client": "^5.13.0",
+    "@prisma/client": "^5.14.0",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-label": "^2.0.2",
@@ -46,7 +46,7 @@
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.1",
     "globals": "^15.2.0",
-    "prisma": "^5.13.0",
+    "prisma": "^5.14.0",
     "typescript-eslint": "^7.8.0"
   }
 }
